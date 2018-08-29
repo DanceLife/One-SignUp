@@ -1,0 +1,9 @@
+@import '~src/scss/styles.scss';
+
+#example-custom-color{
+    background-color: $green;
+    padding: 5px;
+}
+.spacer {
+    margin-top: 40px; /* my spaces between columns */
+}
