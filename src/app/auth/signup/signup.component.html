@@ -1,4 +1,4 @@
-<div class="row">
+<div *ngIf="savedEmail == ''" class="row">
   <div class="col-xs-12 col-sm-10 col-md-8 col-sm-offset-1 col-md-offset-2">
     <form (ngSubmit)="onSignup(f)" #f="ngForm">
       <div class="form-group">
@@ -19,3 +19,13 @@
   </div>
 </div>
 
+
+<div *ngIf="savedEmail != ''" class="row" >
+  <div class="col-sm-12">
+      <p >Email sent to {{savedEmail}}</p>
+  </div>
+  <button class="btn btn-danger" type="button" (click)="resendEmail()">Resend</button>
+  <button class="btn btn-primary" type="button" (click)="showEmail()">Show</button>
+  <button class="btn btn-success" type="button" (click)="showLocalEmail()">Local</button>
+
+</div>
