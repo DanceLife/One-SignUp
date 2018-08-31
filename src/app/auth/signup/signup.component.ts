@@ -1,6 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, DoCheck, AfterContentInit, AfterViewInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { AuthService } from '../auth.service';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -10,11 +11,10 @@ import { AuthService } from '../auth.service';
 })
 
 export class SignupComponent implements OnInit, OnDestroy{
-  ngOnDestroy(): void {
-    this.authService.savedEmail.complete;
-  }
- 
-  savedEmail: any;
+  
+private subscription2SavedEmail: Subscription;
+
+   savedEmail: any="";
  
   constructor(private authService: AuthService) { 
     authService.savedEmail.subscribe(
@@ -26,17 +26,27 @@ export class SignupComponent implements OnInit, OnDestroy{
   }
 
   ngOnInit() {
-    this.savedEmail = this.authService.theItem;
+    this.authService.getCurrentUser();
+    this.authService.savedEmail.subscribe(
+      (email)=>{
+        this.savedEmail = email;
+      }
+    )
+    this.authService.savedEmail.next(window.localStorage.getItem('emailForSignIn'));
+  
+  }
+  
+  ngOnDestroy(): void {
+  //  this.authService.savedEmail.complete;
   }
 
   resendEmail(){
-    this.authService.theItem = '';
-    //savedEmail.next('');
+    this.authService.savedEmail.next('');
     window.localStorage.setItem('emailForSignIn', '');
   }
 
   showEmail(){
-    console.log(this.authService.theItem) 
+    console.log(this.authService.savedEmail) 
   }
   showLocalEmail(){
     console.log("this.savedEmail: ",this.savedEmail);
@@ -49,7 +59,7 @@ export class SignupComponent implements OnInit, OnDestroy{
     let instance: any = this;
    // this.savedEmail = localStorage.getItem("emailForSignIn");
 
-    this.authService.signupUser(email, password)
+    this.authService.signInUserWithEmail(email)
     .then(
       function() {
       // The link was successfully sent. Inform the user.
@@ -57,7 +67,7 @@ export class SignupComponent implements OnInit, OnDestroy{
       // if they open the link on the same device.
       console.log("The link was successfully sent. Email saved as: ",email);
       window.localStorage.setItem('emailForSignIn', email);
-      instance.authService.theItem = email;     
+      instance.authService.savedEmail.next(email);     
     })
     .catch(function(error) {
       console.log("Error sending email: ",error)

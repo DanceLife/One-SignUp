@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
 
 export class ProfileComponent implements OnInit,OnDestroy {
   ngOnDestroy(): void {
-   this.subscription.unsubscribe();
+   //this.subscription.unsubscribe();
   }
 
   apiKey: string;
@@ -19,16 +19,12 @@ export class ProfileComponent implements OnInit,OnDestroy {
   constructor(private appService: AppService) { }
 
   ngOnInit() {
-
-    this.subscription = this.appService.authKeyChanged
+    this.appService.authKeySubject
     .subscribe(
       (keyAuth: any) => {
-        console.log("Changes Received",keyAuth);
          this.apiKey = keyAuth.apiKey;
          this.authDomain = keyAuth.authDomain;
       }
     )
-
   }
-
 }

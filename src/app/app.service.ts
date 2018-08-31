@@ -1,53 +1,51 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
+import * as firebase from 'firebase';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AppService {
-  authKey = {
-    apiKey: null,
-    authDomain: null  
-  }
-  
-  authKeyChanged = new Subject<any>();
 
-  saveAuthKey(apiKey, authDomain){
-    localStorage.setItem("OneSignUp-apiKey", apiKey);
-    localStorage.setItem("OneSignUp-authDomain", authDomain);
-    this.authKey.apiKey = apiKey;
-    this.authKey.authDomain = authDomain;
-    this.authKeyChanged.next(this.authKey);
+export class AppService {
+  
+  authKey = {"apiKey": null,"authDomain": null}  
+  authKeySubject = new Subject<{"apiKey": null,"authDomain": null}>();
+ 
+  setAuthKey(apiKey, authDomain){
+    this.authKey = {"apiKey": apiKey,"authDomain": authDomain}
+    localStorage.setItem("OneSignUp-authKey", JSON.stringify(this.authKey));
+    this.authKeySubject.next(this.authKey);
   }
 
   clearAuthKey(){
-    localStorage.removeItem("OneSignUp-apiKey");
-    localStorage.removeItem("OneSignUp-authDomain");
-    this.authKey.apiKey = null;
-    this.authKey.authDomain = null;
-    this.authKeyChanged.next(this.authKey);
+    localStorage.removeItem("OneSignUp-authKey");
+    this.authKey = {'apiKey': null,'authDomain': null}  
+    this.authKeySubject.next(this.authKey);
   }
 
   getAuthKey(){
-    if(this.authKey.apiKey == null){
-      this.authKey.apiKey = localStorage.getItem("OneSignUp-apiKey");
-      
-      if(this.authKey.apiKey != null){
-        console.log("apiKey extracted from localStorage");
-      }else{
-        console.log("apiKey not present on localStorage");
-      }
+console.log("getAuthKey")   
+    if(this.authKey.apiKey == null || this.authKey.authDomain == null){
+    this.authKey = JSON.parse(localStorage.getItem("OneSignUp-authKey"));
+    console.log("this.authKey",this.authKey);
     }
-    if(this.authKey.authDomain == null){
-      this.authKey.authDomain = localStorage.getItem("OneSignUp-authDomain");     
-      if(this.authKey.authDomain != null){
-        console.log("authDomain retreived from localStorage");
-      }else{
-        console.log("authDomain not present into the localStorage");
-      }
-    }
-    this.authKeyChanged.next(this.authKey);
+    this.authKeySubject.next(this.authKey);
     return this.authKey;
+  
+  }
+
+  initializeApp(){
+    if(!firebase.app){
+      this.authKey = JSON.parse(localStorage.getItem("OneSignUp-authKey"))
+      this.authKeySubject.next(this.authKey);
+      console.log("Initializing app with ", this.authKey)          
+      firebase.initializeApp({
+      apiKey: this.authKey.apiKey,           
+      authDomain: this.authKey.authDomain 
+      });
+    }else{
+      console.log("Firebase app already inizialiced as: ", firebase.app.name);
+    }
   }
 
   constructor() { }

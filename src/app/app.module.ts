@@ -3,20 +3,19 @@ import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
 import { CoreModule } from './core/core.module';
-import { ProfileComponent } from './profile/profile.component';
 import { AppService } from './app.service';
-import { AuthEditComponent } from './profile/auth-edit/auth-edit.component';
-import { FormsModule } from '@angular/forms';
+
+import { CommonModule } from '@angular/common';
+import { ProfileModule } from './profile/profile.module';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ProfileComponent,
-    AuthEditComponent
   ],
   imports: [
     BrowserModule,
-    FormsModule,
+    CommonModule,
+    ProfileModule, 
     CoreModule
   ],
   providers: [
